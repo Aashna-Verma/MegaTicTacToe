@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Stats from "three/examples/jsm/libs/stats.module";
 import SceneInit from "./SceneInit";
 import TicTacToe from "./TicTacToe";
 
@@ -39,14 +37,14 @@ function App() {
 
 
     const scaleUp = (obj) => {
-      if (obj.scale.x < 1) {
-        obj.scale.x += 0.04;
+      if (obj.scale.x < 0.3) {
+        obj.scale.x += 0.1;
       }
-      if (obj.scale.y < 1) {
-        obj.scale.y += 0.04;
+      if (obj.scale.y < 0.3) {
+        obj.scale.y += 0.1;
       }
-      if (obj.scale.z < 1) {
-        obj.scale.z += 0.04;
+      if (obj.scale.z < 0.3) {
+        obj.scale.z += 0.1;
       }
     };
 

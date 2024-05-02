@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RGBELoader } from 'three/examples/jsm/Addons.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 
@@ -33,7 +34,8 @@ export default class SceneInit {
             1,
             1000
         );
-        this.camera.position.z = 96;
+        this.camera.position.x = 125;
+        this.camera.position.z = 175;
 
         // NOTE: Specify a canvas which is already created in the HTML.
         const canvas = document.getElementById(this.canvasId);
@@ -41,6 +43,7 @@ export default class SceneInit {
             canvas,
             // NOTE: Anti-aliasing smooths out the edges.
             antialias: true,
+            alpha: true,
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         // this.renderer.shadowMap.enabled = true;
@@ -57,10 +60,19 @@ export default class SceneInit {
         this.scene.add(this.ambientLight);
 
         // directional light - parallel sun rays
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        this.directionalLight = new THREE.DirectionalLight(0x337AFF3, 1);
         this.directionalLight.castShadow = true;
         this.directionalLight.position.set(0, 32, 64);
         this.scene.add(this.directionalLight);
+
+        // add an environment light
+        new RGBELoader().load('/sepulchral_chapel_rotunda_2k.hdr', (environmentMap) => {
+            environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+            //this.scene.background = environmentMap;
+            this.scene.environment = environmentMap;
+        });
+        
+        this.renderer.setClearColor(0xFFFFFF, 0);
 
         // if window resizes
         window.addEventListener('resize', () => this.onWindowResize(), false);
