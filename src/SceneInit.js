@@ -41,12 +41,10 @@ export default class SceneInit {
         const canvas = document.getElementById(this.canvasId);
         this.renderer = new THREE.WebGLRenderer({
             canvas,
-            // NOTE: Anti-aliasing smooths out the edges.
             antialias: true,
             alpha: true,
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        // this.renderer.shadowMap.enabled = true;
         document.body.appendChild(this.renderer.domElement);
 
         this.clock = new THREE.Clock();
@@ -68,30 +66,17 @@ export default class SceneInit {
         // add an environment light
         new RGBELoader().load('/sepulchral_chapel_rotunda_2k.hdr', (environmentMap) => {
             environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-            //this.scene.background = environmentMap;
             this.scene.environment = environmentMap;
         });
         
+        // background color of the scene
         this.renderer.setClearColor(0xFFFFFF, 0);
 
-        // if window resizes
         window.addEventListener('resize', () => this.onWindowResize(), false);
 
-        // NOTE: Load space background.
-        // this.loader = new THREE.TextureLoader();
-        // this.scene.background = this.loader.load('./pics/space.jpeg');
-
-        // NOTE: Declare uniforms to pass into glsl shaders.
-        // this.uniforms = {
-        //   u_time: { type: 'f', value: 1.0 },
-        //   colorB: { type: 'vec3', value: new THREE.Color(0xfff000) },
-        //   colorA: { type: 'vec3', value: new THREE.Color(0xffffff) },
-        // };
     }
 
     animate() {
-        // NOTE: Window is implied.
-        // requestAnimationFrame(this.animate.bind(this));
         window.requestAnimationFrame(this.animate.bind(this));
         this.render();
         this.stats.update();
@@ -99,8 +84,6 @@ export default class SceneInit {
     }
 
     render() {
-        // NOTE: Update uniform data on each render.
-        // this.uniforms.u_time.value += this.clock.getDelta();
         this.renderer.render(this.scene, this.camera);
     }
 
