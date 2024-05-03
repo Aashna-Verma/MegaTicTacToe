@@ -4,10 +4,16 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-// make an enums for the difficulty
-const Mode = {
+// Enums for the difficulty mode
+export const Mode = {
     NORMAL: 1,
     HARD: 2
+}
+
+const Board = {
+    "-40, 40" : { number: 1, position: [0,0]  }, "-40, 0" : { number: 4, position: [0,1] }, "-40, -40" : { number: 7, position: [0,2] },
+    "0, 40"   : { number: 2, position: [1,0]  }, "0, 0"   : { number: 5, position: [1,1] }, "0, -40"   : { number: 8, position: [1,2] },
+    "40, 40"  : { number: 3, position: [2,0]  }, "40, 0"  : { number: 6, position: [2,1] }, "40, -40"  : { number: 9, position: [2,2] }
 }
 
 
@@ -28,13 +34,18 @@ export default class TicTacToe {
         this.board.add(this.circles);
         this.board.add(this.crosses);
 
-        this.mode = Mode.NORMAL;
+        this.mode = Mode.HARD;
         this.currentPlayer = 'o';
         this.boardCopy = [
-            ["-", "-", "-"],
-            ["-", "-", "-"],
-            ["-", "-", "-"],
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
         ];
+        // this.boardCopy = [
+        //     ["-", "-", "-"],
+        //     ["-", "-", "-"],
+        //     ["-", "-", "-"],
+        // ];
         this.xMoves = [];
         this.oMoves = [];
 
@@ -44,7 +55,7 @@ export default class TicTacToe {
             opacity: 1,
             metalness: 0,
             roughness: 0,
-            ior: 3,
+            ior: 2.33,
             thickness: 0.9,
             specularIntensity: 1,
             specularColor: 0xffffff,
@@ -170,29 +181,38 @@ export default class TicTacToe {
             this.AddCircle(xOffset, yOffset);
             this.UpdateBoard(xOffset, yOffset);
             this.oMoves.push([xOffset, yOffset]);
-            this.currentPlayer = 'x';
         } else {
             this.AddCross(xOffset, yOffset);
             this.UpdateBoard(xOffset, yOffset);
             this.xMoves.push([xOffset, yOffset]);
-            this.currentPlayer = 'o';
         }
 
         this.CheckWin();
+
+        this.currentPlayer = this.currentPlayer === 'o' ? 'x' : 'o';
     }
 
     ChangeMode(mode) {
+        console.log("mode changed to " + mode);
         this.mode = mode;
     }
 
     DeleteFirstMove(){
-        if (this.currentPlayer === 'o'){
-            const oldestMove = this.oMoves.popFirst();
-            this.boardCopy[oldestMove[0]][oldestMove[1]] = '-';
+        if (this.currentPlayer === 'o' && this.oMoves.length > 3){
+            //console.log("deleting oldest o move");
+            const [xOffset, yOffset] = this.oMoves.shift();
+            const b = Board[`${xOffset}, ${yOffset}`]
+            this.boardCopy[b.position[0]][b.position[1]] = b.number.toString();
+            this.circles.children.splice(0, 1);
+            this.hiddenTiles.children.push(this.HiddenTile(xOffset, yOffset));
         }
-        else{
-            const oldestMove = this.xMoves.popFirst();
-            this.boardCopy[oldestMove[0]][oldestMove[1]] = '-';
+        else if (this.currentPlayer === 'x' && this.xMoves.length > 3){
+            //console.log("deleting oldest x move");
+            const [xOffset, yOffset] = this.xMoves.shift();
+            const b = Board[`${xOffset}, ${yOffset}`]
+            this.boardCopy[b.position[0]][b.position[1]] = b.number.toString();
+            this.crosses.children.splice(0, 1);
+            this.hiddenTiles.children.push(this.HiddenTile(xOffset, yOffset));
         }
     }
 
@@ -203,7 +223,9 @@ export default class TicTacToe {
 
         if (this.CheckRows() || this.CheckColumns() || this.CheckDiagonals()){
             console.log('win');
-            alert('win');
+            // setTimeout(() => {
+            //     this.ClearBoard();
+            // }, 1000);
         }
     }
 
@@ -233,6 +255,21 @@ export default class TicTacToe {
             return true;
         }
         return false;
+    }
+
+    ClearBoard(){
+        this.boardCopy = [
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+        ];
+        this.xMoves = [];
+        this.oMoves = [];
+        this.currentPlayer = 'o';
+        this.circles.children = [];
+        this.crosses.children = [];
+        this.hiddenTiles.children = [];
+        this.CreateBoard();
     }
 
 }
